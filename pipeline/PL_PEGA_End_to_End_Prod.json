@@ -1,0 +1,588 @@
+{
+	"name": "PL_PEGA_End_to_End_Prod",
+	"properties": {
+		"description": "PEGA end to End Pipeline. - Production",
+		"activities": [
+			{
+				"name": "ACT_Get_Metadata",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_BatchID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_Pega_CSV",
+						"type": "DatasetReference",
+						"parameters": {
+							"landingPath": {
+								"value": "@activity('ACT_LKP_BatchID').output.firstRow.LandingPath",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "ACT_Filter_Work",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "ACT_Get_Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ACT_Get_Metadata').output.childitems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@and(and(and(contains(replace(item().name,'FPSS_',''),'Work'), not(startsWith(item().name,'PG'))), not(contains(item().name, 'POList'))), not(contains(item().name, 'CPCLExceededData')))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ACT_Filter_History",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "ACT_Get_Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ACT_Get_Metadata').output.childitems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@and(contains(replace(item().name,'FPSS_',''),'History'), not(contains(item().name, 'WebChatBot')))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ACT_For_Each_Work",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ACT_Filter_Work",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ACT_Filter_Work').output.Value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "ACT_VAR_File_Tower_Work",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varTowerWork",
+								"value": {
+									"value": "@substring(replace(item().name,'FPSS_Work_',''), 0, indexof(replace(item().name,'FPSS_Work_',''), '_'))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "ACT_LKP_Work",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "ACT_LKP_Table_ID_Work",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"sqlReaderQuery": {
+										"value": "SELECT [table_id]      ,[ExternalTableName]       ,[FinalTableName]      ,[SchemaName]      ,[ExternalSchemaName]      ,[FinalTableIndex]      ,[FinalDistributionType]\n      ,[FinalDistributionColumn]       ,[polybase_ingest_path]      ,[polybase_file_format]      ,[polybase_data_source]\n      ,[FinalTableColumns1]      ,[DatabrickColumns1]      ,[ExternalTableColumns1]      ,[SourceTableColumns1]\n      ,[DatabricksExternalColumns]      ,[SourceTableColumns]      ,[FinalTableColumns]      ,[DatabrickColumns]\n  FROM [adf].[vw_control_table_columns_refined_final_asdw]\nWHERE Table_ID =@{activity('ACT_LKP_Table_ID_Work').output.firstRow.table_ID}",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_synapse_control_source",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "ACT_VAR_Table_Name_Work",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "ACT_VAR_File_Tower_Work",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varTableNameWork",
+								"value": {
+									"value": "@concat(variables('varTowerWork'),'_work')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "ACT_LKP_Table_ID_Work",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "ACT_VAR_Table_Name_Work",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"sqlReaderQuery": {
+										"value": "SELECT table_ID FROM [adf].[vw_control_table_columns_refined_final_asdw] WHERE [FinalTableName] = '@{variables('varTableNameWork')}'",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_synapse_control_source",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "ACT_ADB_Work_Notebook",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "ACT_LKP_Work",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/PEGA/pega_load_work_data",
+								"baseParameters": {
+									"batchId": {
+										"value": "@activity('ACT_LKP_BatchID').output.firstRow.BatchID",
+										"type": "Expression"
+									},
+									"fileColDelimiter": ",",
+									"fileHeader": "TRUE",
+									"fileName": {
+										"value": "@item().name",
+										"type": "Expression"
+									},
+									"filePath": {
+										"value": "@concat(activity('ACT_LKP_BatchID').output.firstRow.LandingPath,'/',item().name)",
+										"type": "Expression"
+									},
+									"fileQuoteCharacter": "\"",
+									"fileRefinedFormat": "parquet",
+									"fileType": {
+										"value": "@toLower(variables('varTowerWork'))",
+										"type": "Expression"
+									},
+									"folderRefinedColumnName": {
+										"value": "@activity('ACT_LKP_Work').output.firstRow.SourceTableColumns",
+										"type": "Expression"
+									},
+									"fileRefinedName": {
+										"value": "@toLower(variables('varTowerWork'))",
+										"type": "Expression"
+									},
+									"folderRefinedPath": "refineddev/pega/work/",
+									"folderRefinedDatePath": {
+										"value": "@activity('ACT_LKP_BatchID').output.firstRow.RefinedDatePath",
+										"type": "Expression"
+									},
+									"folderRefinedName": {
+										"value": "@toLower(variables('varTowerWork'))",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_adb_processing",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "ACT_Execute_Metadata_Pipeline_Work",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "ACT_ADB_Work_Notebook",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_ASDW_MetaData_Driven_Prod",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"SchemaName": "pega",
+									"FinalTableName": {
+										"value": "@activity('ACT_LKP_Work').output.firstRow.FinalTableName",
+										"type": "Expression"
+									},
+									"BatchID": {
+										"value": "@activity('ACT_LKP_BatchID').output.firstRow.BatchID",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ACT_For_Each_History",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ACT_Filter_History",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ACT_Filter_History').output.Value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "ACT_VAR_File_Tower_History",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varTowerHistory",
+								"value": {
+									"value": "@substring(replace(item().name,'FPSS_History_',''), 0, indexof(replace(item().name,'FPSS_History_',''), '_'))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "ACT_LKP_History",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "ACT_LKP_Table_ID_History",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"sqlReaderQuery": {
+										"value": "SELECT [table_id]      ,[ExternalTableName]       ,[FinalTableName]      ,[SchemaName]      ,[ExternalSchemaName]      ,[FinalTableIndex]      ,[FinalDistributionType]\n      ,[FinalDistributionColumn]       ,[polybase_ingest_path]      ,[polybase_file_format]      ,[polybase_data_source]\n      ,[FinalTableColumns1]      ,[DatabrickColumns1]      ,[ExternalTableColumns1]      ,[SourceTableColumns1]\n      ,[DatabricksExternalColumns]      ,[SourceTableColumns]      ,[FinalTableColumns]      ,[DatabrickColumns]\n  FROM [adf].[vw_control_table_columns_refined_final_asdw]\nWHERE Table_ID =@{activity('ACT_LKP_Table_ID_History').output.firstRow.table_ID}",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_synapse_control_source",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "ACT_VAR_Table_Name_History",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "ACT_VAR_File_Tower_History",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varTableNameHistory",
+								"value": {
+									"value": "@concat(variables('varTowerHistory'),'_history')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "ACT_ADB_History_Notebook",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "ACT_LKP_History",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/PEGA/pega_load_history_data",
+								"baseParameters": {
+									"batchId": {
+										"value": "@activity('ACT_LKP_BatchID').output.firstRow.BatchID",
+										"type": "Expression"
+									},
+									"fileColDelimiter": ",",
+									"fileHeader": "TRUE",
+									"fileName": {
+										"value": "@item().name",
+										"type": "Expression"
+									},
+									"filePath": {
+										"value": "@concat(activity('ACT_LKP_BatchID').output.firstRow.LandingPath,'/',item().name)",
+										"type": "Expression"
+									},
+									"fileQuoteCharacter": "\"",
+									"fileRefinedFormat": "parquet",
+									"fileType": {
+										"value": "@toLower(variables('varTowerHistory'))",
+										"type": "Expression"
+									},
+									"folderRefinedColumnName": {
+										"value": "@activity('ACT_LKP_History').output.firstRow.SourceTableColumns",
+										"type": "Expression"
+									},
+									"fileRefinedName": {
+										"value": "@toLower(variables('varTowerHistory'))",
+										"type": "Expression"
+									},
+									"folderRefinedPath": "refineddev/pega/history/",
+									"folderRefinedDatePath": {
+										"value": "@activity('ACT_LKP_BatchID').output.firstRow.RefinedDatePath",
+										"type": "Expression"
+									},
+									"folderRefinedName": {
+										"value": "@toLower(variables('varTowerHistory'))",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_adb_processing",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "ACT_LKP_Table_ID_History",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "ACT_VAR_Table_Name_History",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"sqlReaderQuery": {
+										"value": "SELECT table_ID FROM [adf].[vw_control_table_columns_refined_final_asdw] WHERE [FinalTableName] = '@{variables('varTableNameHistory')}'",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_synapse_control_source",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "ACT_Execute_Metadata_Pipeline_History",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "ACT_ADB_History_Notebook",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_ASDW_MetaData_Driven_Prod",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"SchemaName": "pega",
+									"FinalTableName": {
+										"value": "@activity('ACT_LKP_History').output.firstRow.FinalTableName",
+										"type": "Expression"
+									},
+									"BatchID": {
+										"value": "@activity('ACT_LKP_BatchID').output.firstRow.BatchID",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ACT_LKP_BatchID",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": "SELECT CONCAT(\n\tCAST(YEAR(GETDATE()) AS VARCHAR(4)), CASE WHEN LEN(MONTH(GETDATE())) = 1 THEN CONCAT('0',MONTH(GETDATE())) ELSE MONTH(GETDATE()) END\n\t, CASE WHEN LEN(DAY(GETDATE())) = 1 THEN CONCAT('0',DAY(GETDATE())) ELSE DAY(GETDATE()) END\n\t, LEFT(DATEPART(hh,GETDATE()),1)\n\t, LEFT(DATEPART(mi,GETDATE()),1)\n\t) AS BatchID\n,CONCAT(CAST(YEAR(GETDATE()) AS VARCHAR(4)), '/', CASE WHEN LEN(MONTH(GETDATE())) = 1 THEN CAST(CONCAT('0',MONTH(GETDATE())) AS VARCHAR(2))  ELSE CAST(MONTH(GETDATE()) AS VARCHAR(2)) END\n\t,'/', CASE WHEN LEN(DAY(GETDATE())) = 1 THEN CAST(CONCAT('0',DAY(GETDATE())) AS VARCHAR(2))  ELSE CAST(DAY(GETDATE()) AS VARCHAR(2)) END,'/') AS RefinedDatePath\n,CONCAT('pega/landing/',CAST(YEAR(GETDATE()) AS VARCHAR(4)), '/', CASE WHEN LEN(MONTH(GETDATE())) = 1 THEN CAST(CONCAT('0',MONTH(GETDATE())) AS VARCHAR(2))  ELSE CAST(MONTH(GETDATE()) AS VARCHAR(2)) END\n\t,'/', CASE WHEN LEN(DAY(GETDATE())) = 1 THEN CAST(CONCAT('0',DAY(GETDATE())) AS VARCHAR(2))  ELSE CAST(DAY(GETDATE()) AS VARCHAR(2)) END) AS LandingPath",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"variables": {
+			"varFileName": {
+				"type": "String"
+			},
+			"varTableNameWork": {
+				"type": "String"
+			},
+			"varTowerWork": {
+				"type": "String"
+			},
+			"varTableNameHistory": {
+				"type": "String"
+			},
+			"varTowerHistory": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "NPS/PEGA"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-31T08:30:41Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

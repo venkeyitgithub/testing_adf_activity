@@ -1,0 +1,2122 @@
+{
+	"name": "pl_convert_xls_csv",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy XLStoCSV",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Absolute ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Absolute ID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Hex ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Hex ID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application Name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application Name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application/Technology Nature",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application/Technology Nature",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Life Cycle Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Life Cycle Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Always on CBP",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Always on CBP",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Development Org",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Development Org",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GBS AD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "GBS AD",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Development B3",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Development B3",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Manager",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Manager",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Vendor Application Manager",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Vendor Application Manager",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Lead Solution Architect",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Lead Solution Architect",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Operations Org",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Operations Org",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Operations AD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Operations AD",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Operations B3 Manager",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Operations B3 Manager",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Operations Manager",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Operations Manager",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Vendor Service Operations Supplier",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Vendor Service Operations Supplier",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Vendor Software Supplier",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Vendor Software Supplier",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Technology Supplier",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Technology Supplier",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Hosting",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Hosting",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG License",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG License",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Operating Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Operating Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Deployment Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Deployment Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Retired Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Retired Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Decommissioned Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Decommissioned Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Target System",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Target System",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Instance Operating Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Instance Operating Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Date Last Reviewed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Date Last Reviewed",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Tier",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Tier",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Solutions",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Solutions",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Owning Element",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Owning Element",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Owner City Planning Area",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Owner City Planning Area",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GBS Director",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "GBS Director",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Keyword - AMH",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Keyword - AMH",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Keyword- EAA: Application Classification",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Keyword- EAA: Application Classification",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Site",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Site",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Geographic Scope",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Geographic Scope",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Deployable",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Deployable",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Number Users (concurrent)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Number Users (concurrent)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Number Users (named)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Number Users (named)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Keyword - Subject Area",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Keyword - Subject Area",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Interaction",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Interaction",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IT Service",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IT Service",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Message",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Message",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Conceptual Data Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Conceptual Data Model",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Logical Data Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Logical Data Model",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Physical Data Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Physical Data Model",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application Environment Diagram",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application Environment Diagram",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application Description",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application Description",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application Documentation Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application Documentation Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application Long Name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application Long Name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Standard",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Standard",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Physical Database (Instance)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Physical Database (Instance)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Server (Instance)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Server (Instance)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "All instances have DB?",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "All instances have DB?",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "All instances have Servers?",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "All instances have Servers?",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Logical Database",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Logical Database",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Release",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Release",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Instance",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Instance",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Sensitivity Risk Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Sensitivity Risk Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG FDA Regulated",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG FDA Regulated",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Sox Classification",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Sox Classification",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG BIA Rating for Confidentiality",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG BIA Rating for Confidentiality",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG BIA Rating for Integrity",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG BIA Rating for Integrity",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG BIA Rating for Availability",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG BIA Rating for Availability",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG BIA Rating for Availability (Critical Timescale)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG BIA Rating for Availability (Critical Timescale)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Data Privacy",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Data Privacy",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Data Classification",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Data Classification",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG BIA Document Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG BIA Document Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IT Development CSA Reference Number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IT Development CSA Reference Number",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application Mgmt CSA Reference Number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application Mgmt CSA Reference Number",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IT Operations CSA Reference Number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IT Operations CSA Reference Number",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Security Plan Completed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Security Plan Completed",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Link to Security documentation",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Link to Security documentation",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Employee/Consumer Data Privacy Management Plan Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Employee/Consumer Data Privacy Management Plan Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Records Retention Process Document Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Records Retention Process Document Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Access Control Management Document Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Access Control Management Document Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Event Log Process Document Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Event Log Process Document Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Records Retention Review Last Performed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Records Retention Review Last Performed",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Access Reviews Last Performed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Access Reviews Last Performed",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG TVA Rating",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG TVA Rating",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "BIA Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "BIA Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "No CSA Recorded",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "No CSA Recorded",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Security Plan Incomplete",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Security Plan Incomplete",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Security Documentation Missing",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Security Documentation Missing",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Data Privacy Plan Missing",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Data Privacy Plan Missing",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Records Retention Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Records Retention Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Access Control Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Access Control Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Event Log Process Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Event Log Process Document Missing",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Records Retention Review Overdue",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Records Retention Review Overdue",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Access Review Overdue",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Access Review Overdue",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TVA Not Performed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "TVA Not Performed",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Continuity Plan Type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Continuity Plan Type",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Continuity Plan documented and approved",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Continuity Plan documented and approved",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Continuity Plan last tested and updated",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Continuity Plan last tested and updated",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Continuity Plan Document Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Continuity Plan Document Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Always On Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Always On Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FDA Regulated Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "FDA Regulated Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "SOX Classification Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "SOX Classification Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "BIA Rating C Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "BIA Rating C Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "BIA Rating I Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "BIA Rating I Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "BIA Rating A Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "BIA Rating A Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "BIA Rating A (CT) Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "BIA Rating A (CT) Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Data Privacy Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Data Privacy Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Data Classification Score",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Data Classification Score",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Sensitivity Risk Score Value",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Sensitivity Risk Score Value",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RAMP Value",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "RAMP Value",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RAMP Assessment Completed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "RAMP Assessment Completed",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG RAMP Completion Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG RAMP Completion Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG 21CFR Part 11 Compliance",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG 21CFR Part 11 Compliance",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Client App?",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Client App?",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Web App?",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Web App?",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Web App - Safari",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Web App - Safari",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Web App - Internet Explorer",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Web App - Internet Explorer",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Web App - Chrome",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Web App - Chrome",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Web App - Firefox",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Web App - Firefox",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Client Agnostic",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Client Agnostic",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Browser Agnostic",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Browser Agnostic",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AAA Actual Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "AAA Actual Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AAA Calculated Target",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "AAA Calculated Target",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG APM Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG APM Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Technical Relevance",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Technical Relevance",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Business Relevance",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Business Relevance",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Recommended Life Cycle Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Recommended Life Cycle Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AAA Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "AAA Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AAA Target",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "AAA Target",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Future AAA Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Future AAA Status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Future AAA Status Operating Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Future AAA Status Operating Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Future AAA Status Deployment Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Future AAA Status Deployment Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Future PG Hosting",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Future PG Hosting",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Future PG Hosting Operating Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Future PG Hosting Operating Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Future PG Hosting Deployment Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Future PG Hosting Deployment Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG iRisk Completion Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG iRisk Completion Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Commission Memo Date Approved",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Commission Memo Date Approved",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Commission MemoÂ  Document Link",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Commission MemoÂ  Document Link",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "City (L1)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "City (L1)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Neighborhood (L2)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Neighborhood (L2)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "City Block (L3)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "City Block (L3)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Sub-City Block (L4)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Sub-City Block (L4)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Sub-City Block(L5)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Sub-City Block(L5)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AGF excluded (keyword out of scope)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "AGF excluded (keyword out of scope)",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Missing Overall Documentation",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Missing Overall Documentation",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Has Missing BIA Data",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Has Missing BIA Data",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Has Missing FDA Data",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Has Missing FDA Data",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Has Missing SOX Data",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Has Missing SOX Data",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Has Missing Privacy Data",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Has Missing Privacy Data",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Has Missing Data Classification Data",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Has Missing Data Classification Data",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Missing Risk Documentation?",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Missing Risk Documentation?",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "COUNTGAP HIGH",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "COUNTGAP HIGH",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "COUNTGAP MED",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "COUNTGAP MED",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "COUNTGAP LOW",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "COUNTGAP LOW",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Validation Action Compliance",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Validation Action Compliance",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Portfolio Managed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Portfolio Managed",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Business Processes",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Business Processes",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Modification Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Modification Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Manager email",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Manager email",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Manager intranet ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Manager intranet ID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Application Manager T-number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Application Manager T-number",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Lawful Basis for Processing 1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Lawful Basis for Processing 1",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Lawful Basis for Processing 2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Lawful Basis for Processing 2",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RAMP Location",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "RAMP Location",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RAMP Date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "RAMP Date",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GDPR Relevant",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "GDPR Relevant",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Org Leader of Dev Org",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Org Leader of Dev Org",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Number of Interfaces",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Number of Interfaces",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PG Custom",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PG Custom",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Hosting",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Hosting",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Application Risk & Complexity",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Application Risk & Complexity",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Technology Risk",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Technology Risk",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Potential Impact",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Potential Impact",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Total Risk",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Total Risk",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_adls_excel_source",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_xls2csv_sink",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Utility"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-02T15:46:55Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,172 @@
+{
+	"name": "DS_Pega_CSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_csv_sink",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"landingPath": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "PEGA"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().landingPath",
+					"type": "Expression"
+				},
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "pzInsKey",
+				"type": "String"
+			},
+			{
+				"name": "pxExtractIdentifier",
+				"type": "String"
+			},
+			{
+				"name": "pxExtractDateTime",
+				"type": "String"
+			},
+			{
+				"name": "pxTaskElapsedTime",
+				"type": "String"
+			},
+			{
+				"name": "pxTimeFlowStarted",
+				"type": "String"
+			},
+			{
+				"name": "pyAssignedTo",
+				"type": "String"
+			},
+			{
+				"name": "pyAssignedToWorkGroup",
+				"type": "String"
+			},
+			{
+				"name": "pyFlowKey",
+				"type": "String"
+			},
+			{
+				"name": "pyHistoryType",
+				"type": "String"
+			},
+			{
+				"name": "pyPerformActionTime",
+				"type": "String"
+			},
+			{
+				"name": "pyPerformAssignmentTime",
+				"type": "String"
+			},
+			{
+				"name": "pyPerformTaskTime",
+				"type": "String"
+			},
+			{
+				"name": "pyWorkClass",
+				"type": "String"
+			},
+			{
+				"name": "pxAddedByID",
+				"type": "String"
+			},
+			{
+				"name": "pxAddedBySystem",
+				"type": "String"
+			},
+			{
+				"name": "pxAssignmentElapsedTime",
+				"type": "String"
+			},
+			{
+				"name": "pxAssignmentPastDeadline",
+				"type": "String"
+			},
+			{
+				"name": "pxAssignmentPastGoal",
+				"type": "String"
+			},
+			{
+				"name": "pxEffortActualDelta",
+				"type": "String"
+			},
+			{
+				"name": "pxHistoryForReference",
+				"type": "String"
+			},
+			{
+				"name": "pxResolutionCostDelta",
+				"type": "String"
+			},
+			{
+				"name": "pxTimeCreated",
+				"type": "String"
+			},
+			{
+				"name": "pyAssignmentClass",
+				"type": "String"
+			},
+			{
+				"name": "pyFlowName",
+				"type": "String"
+			},
+			{
+				"name": "pyFlowType",
+				"type": "String"
+			},
+			{
+				"name": "pyMessageKey",
+				"type": "String"
+			},
+			{
+				"name": "pyPerformer",
+				"type": "String"
+			},
+			{
+				"name": "pyTaskID",
+				"type": "String"
+			},
+			{
+				"name": "pyTaskName",
+				"type": "String"
+			},
+			{
+				"name": "pxCommitDateTime",
+				"type": "String"
+			},
+			{
+				"name": "pxInsName",
+				"type": "String"
+			},
+			{
+				"name": "pxObjClass",
+				"type": "String"
+			},
+			{
+				"name": "pxSaveDateTime",
+				"type": "String"
+			},
+			{
+				"name": "pyLabel",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

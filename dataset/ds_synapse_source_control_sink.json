@@ -1,0 +1,17 @@
+{
+	"name": "ds_synapse_source_control_sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Synapse_dev",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "fpssdev",
+			"table": "source_control"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

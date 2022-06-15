@@ -1,0 +1,94 @@
+{
+	"name": "PL_NPS_Load_Pypestream_Prod",
+	"properties": {
+		"activities": [
+			{
+				"name": "ACT_LKP_Table_Information",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": "SELECT [table_id]\t  ,[final_schema]      ,[process_group]      ,[final_table_name]\n  FROM [adf].[control_table_refined_final_asdw]   where process_group = 'pypestream'\nUNION ALL\n  SELECT [table_id]\t  ,[final_schema]      ,[process_group]      ,[final_table_name]\n  FROM [adf].[control_table_refined_final_asdw]   where process_group = 'buyerdashboard'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ACT_For_Each_Work",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Table_Information",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ACT_LKP_Table_Information').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 2,
+					"activities": [
+						{
+							"name": "ACT_Execute_Metadata_Pipeline_Work",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_ASDW_MetaData_Driven_Prod",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"SchemaName": {
+										"value": "@item().final_schema",
+										"type": "Expression"
+									},
+									"FinalTableName": {
+										"value": "@item().final_table_name",
+										"type": "Expression"
+									},
+									"BatchID": {
+										"value": "@pipeline().parameters.BatchID",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"BatchID": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "NPS/Pypestream"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-31T08:30:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

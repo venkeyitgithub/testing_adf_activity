@@ -1,0 +1,15 @@
+{
+	"name": "ls_fpss_adl_sink",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlsfpsspgcomprod01.dfs.core.windows.net"
+		},
+		"connectVia": {
+			"referenceName": "shir-fpss-external2",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

@@ -1,0 +1,33 @@
+{
+	"name": "ls_synapse_control_source",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"synapsedb": {
+				"type": "String",
+				"defaultValue": "synapsefpsspgcomdatahubdev01db"
+			},
+			"synapseserver": {
+				"type": "String",
+				"defaultValue": "synapsefpsspgcomdatahubdev01.database.windows.net"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().synapseserver};Initial Catalog=@{linkedService().synapsedb};User ID=asdw_dev_table_refresher",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "akvsynapsedev",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "akv-asdwdevtablerefresher"
+			}
+		},
+		"connectVia": {
+			"referenceName": "shir-fpss-external2",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

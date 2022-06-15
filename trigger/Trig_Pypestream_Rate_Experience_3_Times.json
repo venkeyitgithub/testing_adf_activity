@@ -1,0 +1,31 @@
+{
+	"name": "Trig_Pypestream_Rate_Experience_3_Times",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_RateMyExperience_Pipeline_Prod",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-05-30T18:42:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"hours": [
+						5,
+						12,
+						20
+					]
+				}
+			}
+		}
+	}
+}

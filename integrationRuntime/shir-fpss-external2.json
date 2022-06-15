@@ -1,0 +1,7 @@
+{
+	"name": "shir-fpss-external2",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "shir-fpss-external2"
+	}
+}

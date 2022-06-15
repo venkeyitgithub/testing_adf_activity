@@ -1,0 +1,173 @@
+{
+	"name": "ds_adls_csv_sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_csv_sink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "securitydatahub/IssueClosure/Input",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Source Type",
+				"type": "String"
+			},
+			{
+				"name": "Name",
+				"type": "String"
+			},
+			{
+				"name": "Issues ID",
+				"type": "String"
+			},
+			{
+				"name": "Issue Details",
+				"type": "String"
+			},
+			{
+				"name": "Overall Status",
+				"type": "String"
+			},
+			{
+				"name": "Auditable Entity ID",
+				"type": "String"
+			},
+			{
+				"name": "Auditable Entity",
+				"type": "String"
+			},
+			{
+				"name": "Record Creator",
+				"type": "String"
+			},
+			{
+				"name": "Issue Owner",
+				"type": "String"
+			},
+			{
+				"name": "Issue Approver",
+				"type": "String"
+			},
+			{
+				"name": "Fiscal Year",
+				"type": "String"
+			},
+			{
+				"name": "First Published",
+				"type": "String"
+			},
+			{
+				"name": "Estimated Completion Date",
+				"type": "String"
+			},
+			{
+				"name": "Due Date",
+				"type": "String"
+			},
+			{
+				"name": "Priority",
+				"type": "String"
+			},
+			{
+				"name": "Action Plans",
+				"type": "String"
+			},
+			{
+				"name": "RAF ID",
+				"type": "String"
+			},
+			{
+				"name": "Engagement",
+				"type": "String"
+			},
+			{
+				"name": "Date Closed",
+				"type": "String"
+			},
+			{
+				"name": "Primary Risk Theme",
+				"type": "String"
+			},
+			{
+				"name": "Secondary Risk Theme(s)",
+				"type": "String"
+			},
+			{
+				"name": "Organization Unit",
+				"type": "String"
+			},
+			{
+				"name": "Business Unit",
+				"type": "String"
+			},
+			{
+				"name": "Sub-Unit_ do not delete",
+				"type": "String"
+			},
+			{
+				"name": "Region(s)",
+				"type": "String"
+			},
+			{
+				"name": "Sub-Region(s)",
+				"type": "String"
+			},
+			{
+				"name": "Countries",
+				"type": "String"
+			},
+			{
+				"name": "Locations",
+				"type": "String"
+			},
+			{
+				"name": "Organization",
+				"type": "String"
+			},
+			{
+				"name": "CSA Coordinator(s)",
+				"type": "String"
+			},
+			{
+				"name": "Business Controls Facilitator(s)",
+				"type": "String"
+			},
+			{
+				"name": "General Manager / SVP",
+				"type": "String"
+			},
+			{
+				"name": "Client Stewardship Consultant(s)",
+				"type": "String"
+			},
+			{
+				"name": "Department Head(s)",
+				"type": "String"
+			},
+			{
+				"name": "Finance Manager(s)",
+				"type": "String"
+			},
+			{
+				"name": "Audit Process",
+				"type": "String"
+			},
+			{
+				"name": "Program",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

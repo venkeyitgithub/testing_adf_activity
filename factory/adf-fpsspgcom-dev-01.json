@@ -1,0 +1,9 @@
+{
+	"name": "adf-fpsspgcom-dev-01",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5317d103-0576-4f32-aa3e-68ecc45687ff",
+		"tenantId": "3596192b-fdf5-4e2c-a6fa-acb706c963d8"
+	}
+}

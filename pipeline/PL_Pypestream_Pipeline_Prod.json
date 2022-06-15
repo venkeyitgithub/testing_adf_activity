@@ -1,0 +1,940 @@
+{
+	"name": "PL_Pypestream_Pipeline_Prod",
+	"properties": {
+		"description": "Pipeline for Pypestream DataPulls",
+		"activities": [
+			{
+				"name": "ACT_LKP_Get_Execution_Run_ID",
+				"description": "Lookup to obtain the Execution Run ID from Synapse",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderStoredProcedureName": "[adf].[dev_usp_execution_log_insert]",
+						"storedProcedureParameters": {
+							"current_change_tracking": {
+								"type": "String",
+								"value": {
+									"value": "0",
+									"type": "Expression"
+								}
+							},
+							"database_name": {
+								"type": "String",
+								"value": {
+									"value": "Parent",
+									"type": "Expression"
+								}
+							},
+							"land_folder_date": {
+								"type": "String",
+								"value": null
+							},
+							"land_folder_hour": {
+								"type": "String",
+								"value": null
+							},
+							"is_finished": {
+								"type": "Byte[]",
+								"value": "0"
+							},
+							"is_successful": {
+								"type": "Byte[]",
+								"value": "0"
+							},
+							"parent_execution_id": {
+								"type": "String",
+								"value": "0"
+							},
+							"table_name": {
+								"type": "String",
+								"value": "All"
+							},
+							"table_schema_name": {
+								"type": "String",
+								"value": "All"
+							},
+							"row_count": {
+								"type": "Int64",
+								"value": null
+							},
+							"copy_duration_sec": {
+								"type": "Int64",
+								"value": null
+							},
+							"failure_stage": {
+								"type": "String",
+								"value": null
+							}
+						},
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ACT_LKP_Get_Pypestream_Info",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Get_Execution_Run_ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": {
+							"value": "SELECT table_name     ,source_type      ,storage_folder      ,username      ,key_vault_password, load_type, processing_folder, api_call  FROM adf.vw_pypestream_metadata WHERE process_group = 'pypestream' and load_type = 'prod'",
+							"type": "Expression"
+						},
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ACT_Variable_Execution_ID",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Get_Execution_Run_ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "vExecutionID",
+					"value": {
+						"value": "@activity('ACT_LKP_Get_Execution_Run_ID').output.firstRow.etl_execution_id",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ACT_LKP_Get_Date_Info",
+				"description": "Get Date Info",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Get_Execution_Run_ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderStoredProcedureName": "[adf].[usp_nps_get_datetime]",
+						"storedProcedureParameters": {
+							"date_pipeline": {
+								"type": "String",
+								"value": {
+									"value": "@string(pipeline().TriggerTime)",
+									"type": "Expression"
+								}
+							}
+						},
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ACT_LKP_Get_Filetype",
+				"description": "Get File Type",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Get_Execution_Run_ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": {
+							"value": "SELECT CONCAT('_',\nCAST(YEAR(GETUTCDATE()) as Char(4)), \nCASE WHEN LEN(Month(GETUTCDATE())) < 2 THEN CONCAT('0', Month(GETUTCDATE())) ELSE CAST(Month(GETUTCDATE()) AS CHAR(2)) END, \nCASE WHEN LEN(Day(GETUTCDATE())) < 2 THEN CONCAT('0', Day(GETUTCDATE())) ELSE CAST(Day(GETUTCDATE()) AS CHAR(2)) END, \nCASE WHEN LEN(Datepart(HOUR, GETUTCDATE())) < 2 THEN CONCAT('0', Datepart(HOUR, GETUTCDATE())) ELSE CAST(Datepart(HOUR, GETUTCDATE()) AS CHAR(2)) END, \nCASE WHEN LEN(Datepart(Minute, GETUTCDATE())) < 2 THEN CONCAT('0', Datepart(Minute, GETUTCDATE())) ELSE CAST(Datepart(Minute, GETUTCDATE()) AS CHAR(2)) END,\nCASE WHEN LEN(Datepart(SECOND, GETUTCDATE())) < 2 THEN CONCAT('0', Datepart(SECOND, GETUTCDATE())) ELSE CAST(Datepart(SECOND, GETUTCDATE()) AS CHAR(2)) END, '.json') AS filenametype",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ACT_ForEach_Pypestream",
+				"description": "Defining Activity for Each of the Pypestream Sources",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Get_Pypestream_Info",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "ACT_Variable_Execution_ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "ACT_LKP_Get_Date_Info",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "ACT_LKP_Get_Filetype",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ACT_LKP_Get_Pypestream_Info').output.value",
+						"type": "Expression"
+					},
+					"batchCount": 1,
+					"activities": [
+						{
+							"name": "ACT_LKP_Start_Time",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"sqlReaderQuery": {
+										"value": "SELECT GETUTCDATE() AS start_date",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_synapse_control_source",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "ACT_Copy_Data",
+							"description": "Copy Data for each Pypestream Source",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "ACT_LKP_Start_Time",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET"
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_API_Pypestream",
+									"type": "DatasetReference",
+									"parameters": {
+										"username": {
+											"value": "@item().username",
+											"type": "Expression"
+										},
+										"password": {
+											"value": "@item().key_vault_password",
+											"type": "Expression"
+										},
+										"date_from": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.date_from",
+											"type": "Expression"
+										},
+										"date_to": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.date_to",
+											"type": "Expression"
+										},
+										"call": {
+											"value": "@item().api_call",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ABLB_NPS_JSON",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder": {
+											"value": "@concat(item().storage_folder, activity('ACT_LKP_Get_Date_Info').output.firstRow.folder)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "ACT_Copy_Data_Processing",
+							"description": "Actual Data Processing Step",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "ACT_Copy_Data",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET"
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_API_Pypestream",
+									"type": "DatasetReference",
+									"parameters": {
+										"username": {
+											"value": "@item().username",
+											"type": "Expression"
+										},
+										"password": {
+											"value": "@item().key_vault_password",
+											"type": "Expression"
+										},
+										"date_from": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.date_from",
+											"type": "Expression"
+										},
+										"date_to": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.date_to",
+											"type": "Expression"
+										},
+										"call": {
+											"value": "@item().api_call",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ABLB_NPS_JSON_Filename",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder": {
+											"value": "@item().processing_folder",
+											"type": "Expression"
+										},
+										"filename": {
+											"value": "@concat(item().table_name, activity('ACT_LKP_Get_Filetype').output.firstRow.filenametype)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "ACT_SP_Update_Information_Success",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "ACT_Copy_Data_Processing",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[adf].[dev_usp_execution_log_insert_detail]",
+								"storedProcedureParameters": {
+									"current_change_tracking": {
+										"value": {
+											"value": "0",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"database_name": {
+										"value": {
+											"value": "NPS",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"land_folder_date": {
+										"value": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.land_folder_date",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"land_folder_hour": {
+										"value": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.land_folder_hour",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"is_finished": {
+										"value": "1",
+										"type": "Byte[]"
+									},
+									"is_successful": {
+										"value": "1",
+										"type": "Byte[]"
+									},
+									"parent_execution_id": {
+										"value": {
+											"value": "@variables('vExecutionID')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"start_time": {
+										"value": {
+											"value": "@activity('ACT_LKP_Start_Time').output.firstRow.start_date",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"table_name": {
+										"value": {
+											"value": "@item().table_name",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"table_schema_name": {
+										"value": {
+											"value": "NPS",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"row_count": {
+										"value": {
+											"value": "0",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"copy_duration_sec": {
+										"value": {
+											"value": "0",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"failure_stage": {
+										"value": null,
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_Synapse_dev",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "ACT_SP_Update_Information_Failure_DB",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "ACT_Copy_Data_Processing",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[adf].[dev_usp_execution_log_insert_detail]",
+								"storedProcedureParameters": {
+									"copy_duration_sec": {
+										"value": {
+											"value": "0",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"current_change_tracking": {
+										"value": {
+											"value": "0",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"database_name": {
+										"value": {
+											"value": "NPS",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"failure_stage": {
+										"value": "ingestion",
+										"type": "String"
+									},
+									"is_finished": {
+										"value": "1",
+										"type": "Byte"
+									},
+									"is_successful": {
+										"value": "0",
+										"type": "Byte"
+									},
+									"land_folder_date": {
+										"value": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.land_folder_date",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"land_folder_hour": {
+										"value": {
+											"value": "@activity('ACT_LKP_Get_Date_Info').output.firstRow.land_folder_hour",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"parent_execution_id": {
+										"value": {
+											"value": "@variables('vExecutionID')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"row_count": {
+										"value": {
+											"value": "0",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"start_time": {
+										"value": {
+											"value": "@activity('ACT_LKP_Start_Time').output.firstRow.start_date",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"table_name": {
+										"value": {
+											"value": "@item().table_name",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"table_schema_name": {
+										"value": {
+											"value": "NPS",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_Synapse_dev",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ACT_SP_Update_Execution_Run_Success",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ACT_ForEach_Pypestream",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[adf].[dev_usp_execution_log_update]",
+					"storedProcedureParameters": {
+						"current_change_tracking": {
+							"value": "0",
+							"type": "String"
+						},
+						"database_name": {
+							"value": "Parent",
+							"type": "String"
+						},
+						"is_finished": {
+							"value": "1",
+							"type": "Byte"
+						},
+						"is_successful": {
+							"value": "1",
+							"type": "Byte"
+						},
+						"land_folder_date": {
+							"value": null,
+							"type": "String"
+						},
+						"land_folder_hour": {
+							"value": null,
+							"type": "String"
+						},
+						"parent_execution_id": {
+							"value": {
+								"value": "@variables('vExecutionID')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"row_count": {
+							"value": null,
+							"type": "Int64"
+						},
+						"table_name": {
+							"value": "NPS",
+							"type": "String"
+						},
+						"table_schema_name": {
+							"value": {
+								"value": "NPS",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_Synapse_dev",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ACT_SP_Update_Execution_Run_Failure",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ACT_ForEach_Pypestream",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[adf].[dev_usp_execution_log_update]",
+					"storedProcedureParameters": {
+						"current_change_tracking": {
+							"value": "0",
+							"type": "String"
+						},
+						"database_name": {
+							"value": "Parent",
+							"type": "String"
+						},
+						"is_finished": {
+							"value": "1",
+							"type": "Byte"
+						},
+						"is_successful": {
+							"value": "0",
+							"type": "Byte"
+						},
+						"land_folder_date": {
+							"value": null,
+							"type": "String"
+						},
+						"land_folder_hour": {
+							"value": null,
+							"type": "String"
+						},
+						"parent_execution_id": {
+							"value": {
+								"value": "@variables('vExecutionID')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"row_count": {
+							"value": null,
+							"type": "Int64"
+						},
+						"table_name": {
+							"value": {
+								"value": "NPS",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"table_schema_name": {
+							"value": "NPS",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_Synapse_dev",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ADB_NPS_Transformation_Success",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ACT_SP_Update_Execution_Run_Success",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/NPS/nps_pypestream_transformation"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_adb_processing",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ACT_Execute_ASDW_Metadata_Success",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ADB_NPS_Transformation_Success",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_NPS_Load_Pypestream_Prod",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"BatchID": {
+							"value": "@variables('vExecutionID')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "ADB_NPS_Transformation_Failure",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ACT_SP_Update_Execution_Run_Failure",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/NPS/nps_pypestream_transformation"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_adb_processing",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ACT_Execute_ASDW_Metadata_Failure",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ADB_NPS_Transformation_Failure",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_NPS_Load_Pypestream_Prod",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"BatchID": {
+							"value": "@variables('vExecutionID')",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"variables": {
+			"vExecutionID": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "NPS/Pypestream"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-31T08:30:42Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

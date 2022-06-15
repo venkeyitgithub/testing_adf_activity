@@ -1,0 +1,93 @@
+{
+	"name": "pl_powerautomate",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy PowerAutomate",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_http_source",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_csv_sink",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"ContainerName": {
+				"type": "string"
+			},
+			"Directory": {
+				"type": "string"
+			},
+			"Filename": {
+				"type": "string"
+			},
+			"ParentContainerName": {
+				"type": "string"
+			},
+			"ParentDirectory": {
+				"type": "string"
+			},
+			"ParentFileName": {
+				"type": "string"
+			},
+			"filetype": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "HTTP"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-03-22T15:18:44Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,407 @@
+{
+	"name": "pl_ingest_files",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEachFile",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Control Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Control Table').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Process Files",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:30:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/mopur.ym@pg.com/orchestration",
+								"baseParameters": {
+									"target_filename": {
+										"value": "@item().target_filename",
+										"type": "Expression"
+									},
+									"source_container": {
+										"value": "@item().source_container",
+										"type": "Expression"
+									},
+									"source_directory": {
+										"value": "@item().source_directory",
+										"type": "Expression"
+									},
+									"target_container": {
+										"value": "@item().target_container",
+										"type": "Expression"
+									},
+									"target_directory": {
+										"value": "@item().target_directory",
+										"type": "Expression"
+									},
+									"target_filetype": {
+										"value": "@item().target_filetype",
+										"type": "Expression"
+									},
+									"storage_account": {
+										"value": "@item().storage_account",
+										"type": "Expression"
+									},
+									"source_filename": {
+										"value": "@item().source_filename",
+										"type": "Expression"
+									},
+									"source_filetype": {
+										"value": "@item().source_filetype",
+										"type": "Expression"
+									},
+									"filename": {
+										"value": "@item().filename",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_adb_processing",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Process File Import Tracker - Failure",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Process Files",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[fpssinfosec].[file_import_tracker_log]",
+								"storedProcedureParameters": {
+									"data_factory_name": {
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"import_error_message": {
+										"value": {
+											"value": "@activity('Process Files').output.runError",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"import_method": {
+										"value": "DataBricks",
+										"type": "String"
+									},
+									"job_end_datetime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"job_start_datetime": {
+										"value": {
+											"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pipeline_group_id": {
+										"value": {
+											"value": "@pipeline().GroupId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_name": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_run_id": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_id": {
+										"value": {
+											"value": "@pipeline().TriggerId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_name": {
+										"value": {
+											"value": "@pipeline().TriggerName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_type": {
+										"value": {
+											"value": "@pipeline().TriggerType",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_name": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_run_id": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineRunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"result": {
+										"value": "FAILED",
+										"type": "String"
+									},
+									"result_id": {
+										"value": "0",
+										"type": "Int32"
+									},
+									"row_count": {
+										"value": null,
+										"type": "String"
+									},
+									"source_file_description": {
+										"value": null
+									},
+									"source_file_name": {
+										"value": {
+											"value": "@item().source_filename",
+											"type": "Expression"
+										}
+									},
+									"destination_folder_path": {
+										"value": {
+											"value": "@item().target_directory",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_Synapse_dev",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Process File Import Tracker - Success",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Process Files",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[fpssinfosec].[file_import_tracker_log]",
+								"storedProcedureParameters": {
+									"data_factory_name": {
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"import_error_message": {
+										"value": null,
+										"type": "String"
+									},
+									"import_method": {
+										"value": "DataBricks",
+										"type": "String"
+									},
+									"job_end_datetime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"job_start_datetime": {
+										"value": {
+											"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pipeline_group_id": {
+										"value": {
+											"value": "@pipeline().GroupId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_name": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_run_id": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_id": {
+										"value": {
+											"value": "@pipeline().TriggerId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_name": {
+										"value": {
+											"value": "@pipeline().TriggerName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_type": {
+										"value": {
+											"value": "@pipeline().TriggerType",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_name": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_run_id": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineRunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"result": {
+										"value": "SUCCESS",
+										"type": "String"
+									},
+									"result_id": {
+										"value": "1",
+										"type": "Int32"
+									},
+									"row_count": {
+										"value": null,
+										"type": "String"
+									},
+									"source_file_description": {
+										"value": null
+									},
+									"source_file_name": {
+										"value": {
+											"value": "@item().source_filename",
+											"type": "Expression"
+										}
+									},
+									"destination_folder_path": {
+										"value": {
+											"value": "@item().target_directory",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_Synapse_dev",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Control Table",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": "SELECT * FROM fpssdev.source_control WHERE project_name <> 'SP_Execution'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"folder": {
+			"name": "HTTP"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-02T15:46:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

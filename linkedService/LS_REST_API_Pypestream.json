@@ -1,0 +1,34 @@
+{
+	"name": "LS_REST_API_Pypestream",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "Linked Service for REST API - Pypestream",
+		"parameters": {
+			"username": {
+				"type": "string"
+			},
+			"password": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://reporting.pypestream.com/api/v2/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Basic",
+			"userName": "@{linkedService().username}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "akvsynapsedev",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().password",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}

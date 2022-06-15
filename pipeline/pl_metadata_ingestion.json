@@ -1,0 +1,138 @@
+{
+	"name": "pl_metadata_ingestion",
+	"properties": {
+		"activities": [
+			{
+				"name": "File Import Tracker",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[fpssinfosec].[file_import_tracker_log]",
+					"storedProcedureParameters": {
+						"data_factory_name": {
+							"value": {
+								"value": "@pipeline().DataFactory",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"destination_folder_path": {
+							"value": null,
+							"type": "String"
+						},
+						"import_error_message": {
+							"value": null,
+							"type": "String"
+						},
+						"import_method": {
+							"value": null,
+							"type": "String"
+						},
+						"job_end_datetime": {
+							"value": "",
+							"type": "DateTime"
+						},
+						"job_start_datetime": {
+							"value": null,
+							"type": "DateTime"
+						},
+						"pipeline_group_id": {
+							"value": {
+								"value": "@pipeline().GroupId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pipeline_name": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pipeline_run_id": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pipeline_trigger_id": {
+							"value": {
+								"value": "@pipeline().TriggerId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pipeline_trigger_name": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pipeline_trigger_type": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pipeline_triggered_by_pipeline_name": {
+							"value": {
+								"value": "@pipeline()?.TriggeredByPipelineName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pipeline_triggered_by_pipeline_run_id": {
+							"value": {
+								"value": "@pipeline()?.TriggeredByPipelineRunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"result": {
+							"value": "SUCCESS",
+							"type": "String"
+						},
+						"result_id": {
+							"value": "1",
+							"type": "Int32"
+						},
+						"row_count": {
+							"value": "",
+							"type": "String"
+						},
+						"source_file_description": {
+							"value": "",
+							"type": "String"
+						},
+						"source_file_name": {
+							"value": "",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_Synapse_dev",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "Utility"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-03-22T15:18:45Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

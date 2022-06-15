@@ -1,0 +1,24 @@
+{
+	"name": "ds_adls_excel_source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_excel_source",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Consolidated_Export_CombineRows",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "applicationfullscope.xlsx",
+				"folderPath": "securitydatahub/ArchitectureHeatMap/Input",
+				"fileSystem": "raw"
+			},
+			"range": "A2",
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

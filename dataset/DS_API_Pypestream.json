@@ -1,0 +1,46 @@
+{
+	"name": "DS_API_Pypestream",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_REST_API_Pypestream",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"username": {
+					"value": "@dataset().username",
+					"type": "Expression"
+				},
+				"password": {
+					"value": "@dataset().password",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"username": {
+				"type": "string"
+			},
+			"password": {
+				"type": "string"
+			},
+			"date_from": {
+				"type": "string"
+			},
+			"date_to": {
+				"type": "string"
+			},
+			"call": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@string(concat(dataset().call,'from=',dataset().date_from,'&to=',dataset().date_to))",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

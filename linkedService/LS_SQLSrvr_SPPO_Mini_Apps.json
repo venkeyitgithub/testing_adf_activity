@@ -1,0 +1,38 @@
+{
+	"name": "LS_SQLSrvr_SPPO_Mini_Apps",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "Linked Service for SQL Server for SPPO Mini Apps",
+		"parameters": {
+			"database": {
+				"type": "string"
+			},
+			"username": {
+				"type": "string"
+			},
+			"password": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=137.182.160.146;Initial Catalog=@{linkedService().database};User ID=@{linkedService().username}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "akvsynapsedev",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().password",
+					"type": "Expression"
+				}
+			}
+		},
+		"connectVia": {
+			"referenceName": "shir-fpss-external2",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

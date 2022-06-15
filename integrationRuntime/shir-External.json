@@ -1,0 +1,12 @@
+{
+	"name": "shir-External",
+	"properties": {
+		"type": "SelfHosted",
+		"typeProperties": {
+			"linkedInfo": {
+				"resourceId": "/subscriptions/1600256d-1898-4362-bd35-197e3da6cb60/resourcegroups/AZ-RG-S2P_DataHub-PROD-01/providers/Microsoft.DataFactory/factories/datahub-adfprod01-vnybydej/integrationruntimes/s2pdatahub-external-shir",
+				"authorizationType": "Rbac"
+			}
+		}
+	}
+}

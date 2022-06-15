@@ -1,0 +1,338 @@
+{
+	"name": "PL_ASDW_MetaData_Driven_Prod",
+	"properties": {
+		"activities": [
+			{
+				"name": "ACT_LKP_Get_Table_ID",
+				"description": "Gets the Table ID for the table being passed",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ACT_IF_Valid_Batch_ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": {
+							"value": "SELECT table_id FROM [adf].[vw_control_table_metadata] WHERE SchemaName = '@{pipeline().parameters.SchemaName}' AND FinalTableName = '@{pipeline().parameters.FinalTableName}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ACT_LKP_Get_Table_Column_Information",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Get_Table_ID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": {
+							"value": "SELECT top 1 [table_id]\n      ,[ExternalTableName]\n      ,[FinalTableName]\n      ,[SchemaName]\n      ,[ExternalSchemaName]\n      ,[FinalTableIndex]\n      ,[FinalDistributionType]\n      ,[FinalDistributionColumn]\n      ,[polybase_ingest_path]\n      ,[polybase_file_format]\n      ,[polybase_data_source]\n      ,[FinalTableColumns1]\n      ,[DatabrickColumns1]\n      ,[ExternalTableColumns1]\n      ,[SourceTableColumns1]\n      ,[DatabricksExternalColumns]\n      ,[SourceTableColumns]\n      ,[FinalTableColumns]\n      ,[DatabrickColumns]  FROM adf.vw_control_table_columns_refined_final_asdw WHERE table_id = @{activity('ACT_LKP_Get_Table_ID').output.firstRow.table_id}",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "ACT_SP_ExternalTable",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ACT_LKP_Get_Table_Column_Information",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[adf].[usp_load_external_table]",
+					"storedProcedureParameters": {
+						"DataSource": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.polybase_data_source",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PolybaseColumnDefinition1": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.ExternalTableColumns1",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PolybaseFileFormat": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.polybase_file_format",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PolybaseInput": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.polybase_ingest_path",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StageSchemaName": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.ExternalSchemaName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StageTableName": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.ExternalTableName",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_Synapse_dev",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ACT_SP_FinalTable_Work",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ACT_SP_ExternalTable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[adf].[usp_load_core_table]",
+					"storedProcedureParameters": {
+						"BatchID": {
+							"value": {
+								"value": "@variables('varBatchID')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"ExternalSchemaName": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.ExternalSchemaName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"ExternalTableName": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.ExternalTableName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FinalDistributionColumn": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.FinalDistributionColumn",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FinalDistributionType": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.FinalDistributionType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FinalTableColumns1": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.FinalTableColumns1",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FinalTableIndex": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.FinalTableIndex",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FinalTableName": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.FinalTableName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"SchemaName": {
+							"value": {
+								"value": "@activity('ACT_LKP_Get_Table_Column_Information').output.firstRow.SchemaName",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_Synapse_dev",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ACT_IF_Valid_Batch_ID",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@or(equals(pipeline().parameters.BatchID,0),equals(pipeline().parameters.BatchID,''))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "ACT_Set_BatchID_1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varBatchID",
+								"value": {
+									"value": "@pipeline().parameters.BatchID",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "ACT_LKP_BatchID",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"sqlReaderQuery": "SELECT CONCAT(\n\tCAST(YEAR(GETDATE()) AS VARCHAR(4)), CASE WHEN LEN(MONTH(GETDATE())) = 1 THEN CONCAT('0',MONTH(GETDATE())) ELSE MONTH(GETDATE()) END\n\t, CASE WHEN LEN(DAY(GETDATE())) = 1 THEN CONCAT('0',DAY(GETDATE())) ELSE DAY(GETDATE()) END\n\t, CASE WHEN LEN(DATEPART(hh,GETDATE())) = 1 THEN CONCAT('0',DATEPART(hh,GETDATE())) ELSE DATEPART(hh,GETDATE()) END\n\t, CASE WHEN LEN(DATEPART(mi,GETDATE())) = 1 THEN CONCAT('0',DATEPART(mi,GETDATE())) ELSE DATEPART(mi,GETDATE()) END\n\t, CASE WHEN LEN(DATEPART(ss,GETDATE())) = 1 THEN CONCAT('0',DATEPART(ss,GETDATE())) ELSE DATEPART(ss,GETDATE()) END\n\t,CASE WHEN LEN(DATEPART(ms,GETDATE())) = 1 THEN CONCAT('0',DATEPART(ms,GETDATE())) ELSE DATEPART(ms,GETDATE()) END) AS BatchID\n   ,CONCAT(CAST(YEAR(GETDATE()-1) AS VARCHAR(4)), '/', CASE WHEN LEN(MONTH(GETDATE()-1)) = 1 THEN CAST(CONCAT('0',MONTH(GETDATE()-1)) AS VARCHAR(2))  ELSE CAST(MONTH(GETDATE()-1) AS VARCHAR(2)) END\n\t,'/', CASE WHEN LEN(DAY(GETDATE()-1)) = 1 THEN CAST(CONCAT('0',DAY(GETDATE()-1)) AS VARCHAR(2))  ELSE CAST(DAY(GETDATE()-1) AS VARCHAR(2)) END,'/') AS RefinedDatePath\n,CONCAT('pega/landing/',CAST(YEAR(GETDATE()-1) AS VARCHAR(4)), '/', CASE WHEN LEN(MONTH(GETDATE()-1)) = 1 THEN CAST(CONCAT('0',MONTH(GETDATE()-1)) AS VARCHAR(2))  ELSE CAST(MONTH(GETDATE()-1) AS VARCHAR(2)) END\n\t,'/', CASE WHEN LEN(DAY(GETDATE()-1)) = 1 THEN CAST(CONCAT('0',DAY(GETDATE()-1)) AS VARCHAR(2))  ELSE CAST(DAY(GETDATE()-1) AS VARCHAR(2)) END) AS LandingPath\n/*,'2020/10/06/' AS RefinedDatePath, 'pega/landing/2020/10/06' AS LandingPath*/",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_synapse_control_source",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "ACT_Set_BatchID",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "ACT_LKP_BatchID",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varBatchID",
+								"value": {
+									"value": "@activity('ACT_LKP_BatchID').output.firstRow.BatchID",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"SchemaName": {
+				"type": "string"
+			},
+			"FinalTableName": {
+				"type": "string"
+			},
+			"BatchID": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"variables": {
+			"varBatchID": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "General/Prod"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-31T08:30:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

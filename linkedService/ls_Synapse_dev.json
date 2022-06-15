@@ -1,0 +1,23 @@
+{
+	"name": "ls_Synapse_dev",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synapsefpsspgcomdatahubdev01.database.windows.net;Initial Catalog=synapsefpsspgcomdatahubdev01db;User ID=asdw_dev_table_refresher",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "akvsynapsedev",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "akv-asdwdevtablerefresher"
+			}
+		},
+		"connectVia": {
+			"referenceName": "shir-fpss-external2",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

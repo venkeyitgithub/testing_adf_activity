@@ -1,0 +1,361 @@
+{
+	"name": "pl_stored_procedures",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup Control Table",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": "SELECT * FROM fpssdev.source_control WHERE filename = 'dimorganization2' or filename = 'dimorganization3' or filename = 'RefiRiskNG' or\nfilename = 'RefiTAMRegistration'\nor filename = 'dimemployees'\nor filename = 'dimapplications'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_synapse_control_source",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach SP",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup Control Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup Control Table').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "SP Notebook",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/mopur.ym@pg.com/orchestrate_sp",
+								"baseParameters": {
+									"filename": {
+										"value": "@item().filename",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_adb_processing",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "SP Tracker - Failure",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "SP Notebook",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[fpssinfosec].[file_import_tracker_log]",
+								"storedProcedureParameters": {
+									"data_factory_name": {
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"import_error_message": {
+										"value": {
+											"value": "@activity('SP Notebook').output.error.message",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"import_method": {
+										"value": "DataBricks",
+										"type": "String"
+									},
+									"job_end_datetime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"job_start_datetime": {
+										"value": {
+											"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pipeline_group_id": {
+										"value": {
+											"value": "@pipeline().GroupId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_name": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_run_id": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_id": {
+										"value": {
+											"value": "@pipeline().TriggerId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_name": {
+										"value": {
+											"value": "@pipeline().TriggerName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_type": {
+										"value": {
+											"value": "@pipeline().TriggerType",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_name": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_run_id": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineRunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"result": {
+										"value": "FAILED",
+										"type": "String"
+									},
+									"result_id": {
+										"value": "0",
+										"type": "Int32"
+									},
+									"row_count": {
+										"value": null,
+										"type": "String"
+									},
+									"source_file_description": {
+										"value": "Stored Procedures"
+									},
+									"source_file_name": {
+										"value": null
+									},
+									"destination_folder_path": {
+										"value": null
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_Synapse_dev",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "SP Tracker - Success",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "SP Notebook",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[fpssinfosec].[file_import_tracker_log]",
+								"storedProcedureParameters": {
+									"data_factory_name": {
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"import_error_message": {
+										"value": null,
+										"type": "String"
+									},
+									"import_method": {
+										"value": "DataBricks",
+										"type": "String"
+									},
+									"job_end_datetime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"job_start_datetime": {
+										"value": {
+											"value": "@convertTimeZone(pipeline().TriggerTime,'UTC','Eastern Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pipeline_group_id": {
+										"value": {
+											"value": "@pipeline().GroupId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_name": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_run_id": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_id": {
+										"value": {
+											"value": "@pipeline().TriggerId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_name": {
+										"value": {
+											"value": "@pipeline().TriggerName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_trigger_type": {
+										"value": {
+											"value": "@pipeline().TriggerType",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_name": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipeline_triggered_by_pipeline_run_id": {
+										"value": {
+											"value": "@pipeline()?.TriggeredByPipelineRunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"result": {
+										"value": "SUCCESS",
+										"type": "String"
+									},
+									"result_id": {
+										"value": "1",
+										"type": "Int32"
+									},
+									"row_count": {
+										"value": null,
+										"type": "String"
+									},
+									"source_file_description": {
+										"value": "Stored Procedures",
+										"type": "String"
+									},
+									"source_file_name": {
+										"value": null
+									},
+									"destination_folder_path": {
+										"value": null
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_Synapse_dev",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "Stored_Procedures"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-05-02T15:46:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
